@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package lau;
+
+option go_package = "github.com/SuperInstance/lau-math-go/pkg/service";
+
+service LauService {
+  // Agent operations
+  rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse);
+  rpc Observe(ObserveRequest) returns (ObserveResponse);
+  rpc GetAgentState(GetAgentStateRequest) returns (AgentState);
+  
+  // Fleet operations
+  rpc GetFleetStatus(FleetStatusRequest) returns (FleetStatus);
+  rpc MergeFleet(MergeFleetRequest) returns (MergeFleetResponse);
+  
+  // Health
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message CreateAgentRequest {
+  string agent_id = 1;
+  int32 dimension = 2;
+  double learning_rate = 3;
+  double energy_budget = 4;
+}
+
+message CreateAgentResponse {
+  string agent_id = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message MatrixData {
+  int32 rows = 1;
+  int32 cols = 2;
+  repeated double data = 3;
+}
+
+message ObserveRequest {
+  string agent_id = 1;
+  MatrixData observation = 2;
+}
+
+message ObserveResponse {
+  bool success = 1;
+  string message = 2;
+  double confidence = 3;
+  double energy = 4;
+}
+
+message GetAgentStateRequest {
+  string agent_id = 1;
+}
+
+message AgentState {
+  string agent_id = 1;
+  string phase = 2;
+  MatrixData belief_state = 3;
+  double confidence = 4;
+  double energy = 5;
+  int64 step_count = 6;
+}
+
+message AgentInfo {
+  string agent_id = 1;
+  string phase = 2;
+  double confidence = 3;
+  double energy = 4;
+}
+
+message FleetStatusRequest {}
+
+message FleetStatus {
+  string fleet_id = 1;
+  int32 agent_count = 2;
+  repeated AgentInfo agents = 3;
+  int32 healthy = 4;
+  int32 violations = 5;
+  double total_deviation = 6;
+}
+
+message MergeFleetRequest {
+  string fleet_id = 1;
+  map<string, bytes> agent_data = 2;
+  repeated uint64 clock_values = 3;
+}
+
+message MergeFleetResponse {
+  bool success = 1;
+  int32 merged_count = 2;
+  string message = 3;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string status = 2;
+  string profile = 3;
+  string backend = 4;
+}
